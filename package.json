@@ -9,19 +9,28 @@
   "scripts": {
     "test": "iojs --harmony_arrow_functions node_modules/mocha/bin/_mocha --recursive --ui bdd ./test"
   },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/sc0ttyd/alt-apiKey-seneca.git"
+  },
   "keywords": [
     "seneca",
     "api",
     "apikey",
-    "api key",
-    "api-key",
+    "api",
+    "key",
+    "api-key"
   ],
   "author": "Scott Donnelly",
   "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/sc0ttyd/alt-apiKey-seneca/issues"
+  },
+  "homepage": "https://github.com/sc0ttyd/alt-apiKey-seneca#readme",
   "dependencies": {
     "bluebird": "^2.9.27",
     "koa-router": "^5.1.1",
-    "lodash": "^3.9.3",
+    "lodash": "^3.9.3"
   },
   "devDependencies": {
     "chai": "^3.0.0",
