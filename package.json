@@ -1,0 +1,37 @@
+{
+  "name": "alt-apikey-seneca",
+  "version": "0.0.1",
+  "description": "Seneca plugin to handle API keys.",
+  "main": "alt-apikey-seneca.js",
+  "directories": {
+    "test": "test"
+  },
+  "scripts": {
+    "test": "iojs --harmony_arrow_functions node_modules/mocha/bin/_mocha --recursive --ui bdd ./test"
+  },
+  "keywords": [
+    "seneca",
+    "api",
+    "apikey",
+    "api key",
+    "api-key",
+  ],
+  "author": "Scott Donnelly",
+  "license": "MIT",
+  "dependencies": {
+    "bluebird": "^2.9.27",
+    "koa-router": "^5.1.1",
+    "lodash": "^3.9.3",
+  },
+  "devDependencies": {
+    "chai": "^3.0.0",
+    "chai-as-promised": "^5.1.0",
+    "koa": "^0.21.0",
+    "koa-mount": "^1.3.0",
+    "mocha": "^2.2.5",
+    "proxyquire": "^1.5.0",
+    "sinon": "^1.14.1",
+    "sinon-chai": "^2.8.0",
+    "supertest": "^1.0.1"
+  }
+}
