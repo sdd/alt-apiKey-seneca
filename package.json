@@ -1,6 +1,6 @@
 {
   "name": "alt-apikey-seneca",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "description": "Seneca plugin to handle API keys.",
   "main": "alt-apikey-seneca.js",
   "directories": {
