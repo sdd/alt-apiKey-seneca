@@ -30,6 +30,7 @@ module.exports = function(seneca_instance, options) {
 	});
 
 	router.get(options.url.retrieve, function* get_apiKey_retrieve() {
+		//TODO: change get to retrieve all the keys for the current user
 		let args = {
 			system  : 'apiKey',
 			action  : 'get',
@@ -40,6 +41,7 @@ module.exports = function(seneca_instance, options) {
 	});
 
 	router.put(options.url.enable, function* put_apiKey_enable() {
+		//TODO: authz
 		let args = {
 			system  : 'apiKey',
 			action  : this.body.enabled ? 'enable' : 'disable',
