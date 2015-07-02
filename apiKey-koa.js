@@ -3,8 +3,13 @@ const _      = require('lodash'),
       router = require('koa-router')();
 
 const defaults = {
-	auth_url    : '/auth/:strategy',
-	callback_url: '/auth/:strategy/callback'
+    url: {
+        create: '/apiKey',
+        retrieve: '/apiKey',
+        enable: '/apiKey/:apiKeyId/enable',
+        disable: '/apiKey/:apiKeyId/disable',
+        del: '/apiKey/:apiKeyId'
+    }
 };
 
 module.exports = function(seneca_instance, options) {
@@ -22,19 +27,18 @@ module.exports = function(seneca_instance, options) {
 		let args   = {
 			system  : 'apiKey',
 			action  : 'create',
-			userId  : this.state.jwt.sub,
-			name    : this.query.name.toString()
+			userId  : _.get(this, 'state.jwt.sub'),
+			name    : _.get(this, 'request.body.name', '').toString()
 		};
 		let result = yield seneca.actAsync(args);
 		this.body  = result;
 	});
 
 	router.get(options.url.retrieve, function* get_apiKey_retrieve() {
-		//TODO: change get to retrieve all the keys for the current user
 		let args = {
 			system  : 'apiKey',
 			action  : 'get',
-			id      : this.apiKeyId
+            userId  : _.get(this, 'state.jwt.sub')
 		};
 		let result = yield seneca.actAsync(args);
 		this.body  = result;
@@ -44,12 +48,34 @@ module.exports = function(seneca_instance, options) {
 		//TODO: authz
 		let args = {
 			system  : 'apiKey',
-			action  : this.body.enabled ? 'enable' : 'disable',
-			id      : this.apiKeyId
+			action  : 'enable',
+            apiKeyId: this.apiKeyId
 		};
 		let result = yield seneca.actAsync(args);
 		this.body  = result;
 	});
+
+    router.put(options.url.disable, function* put_apiKey_disable() {
+        //TODO: authz
+        let args = {
+            system  : 'apiKey',
+            action  : 'disable',
+            apiKeyId: this.apiKeyId
+        };
+        let result = yield seneca.actAsync(args);
+        this.body  = result;
+    });
+
+    router.delete(options.url.del, function* put_apiKey_delete() {
+        //TODO: authz
+        let args = {
+            system  : 'apiKey',
+            action  : 'delete',
+            apiKeyId: this.apiKeyId
+        };
+        let result = yield seneca.actAsync(args);
+        this.status = result.success ? 204 : 404;
+    });
 
 	return router.middleware();
 };

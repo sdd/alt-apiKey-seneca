@@ -12,16 +12,28 @@ chai.use(require("sinon-chai"));
 
 var senecaAuthKoa = require('../apiKey-koa');
 
-describe('seneca-auth-koa', function() {
+describe('apiKey-koa', function() {
+
+    var ctx = {
+        state: {
+            jwt: { sub: 'USERID1' }
+        },
+        session: {}
+    };
 
     var senecaActStub = sinon.stub();
     var senecaMock = { actAsync: senecaActStub };
-    var app = koa().use(senecaAuthKoa(senecaMock));
-    senecaActStub.returns(Promise.resolve({}));
+
+    var app = koa()
+        .use(require('koa-bodyparser')())
+        .use(senecaAuthKoa(senecaMock));
+
+    senecaActStub.returns(Promise.resolve({ apiKey: 'RESULT1' }));
 
     var testRouter = router()
-        .get('/apiKey', function * (next) {
-            this.session = session;
+        .all('*', function * (next) {
+            this.session = ctx.session;
+            this.state = ctx.state;
             yield next;
         });
 
@@ -52,7 +64,7 @@ describe('seneca-auth-koa', function() {
 	        senecaActStub.reset();
 	        request(superApp.listen())
 		        .post('/apiKey')
-		        //TODO: pass userid as sub from jwt in state
+		        // userid passed in as sub from jwt in state
 		        .send({ name: 'APIKEYNAME1' })
 		        .end(function() {
 
@@ -63,5 +75,154 @@ describe('seneca-auth-koa', function() {
 		        });
         });
 
+        it('should return the response from seneca as the body', function(done) {
+            senecaActStub.reset();
+            request(superApp.listen())
+                .post('/apiKey')
+                .send({ name: 'APIKEYNAME1' })
+                .expect(200)
+                .expect('Content-Type', /json/)
+                .expect(function(res) {
+                    expect(res.body.apiKey).to.equal('RESULT1');
+                })
+                .end(done);
+        })
+    });
+
+    describe('GET /apiKey', function() {
+
+        it('should pass the correct system and action to seneca', function(done) {
+
+            senecaActStub.reset();
+            request(superApp.listen())
+                .get('/apiKey')
+                .send({ name: 'APIKEYNAME1' })
+                .expect(function() {
+                    expect(senecaActStub.args[0][0].system).to.equal('apiKey');
+                    expect(senecaActStub.args[0][0].action).to.equal('get');
+                })
+                .end(done);
+        });
+
+        it('should pass the correct userid', function(done) {
+
+            senecaActStub.reset();
+            request(superApp.listen())
+                .get('/apiKey')
+                .expect(function() {
+                    expect(senecaActStub.args[0][0].userId).to.equal('USERID1');
+                })
+                .end(done);
+        });
+
+        it('should return the response from seneca as the body', function(done) {
+            senecaActStub.reset();
+            request(superApp.listen())
+                .get('/apiKey')
+                .expect(200)
+                .expect('Content-Type', /json/)
+                .expect(function(res) {
+                    expect(res.body.apiKey).to.equal('RESULT1');
+                })
+                .end(done);
+        })
+    });
+
+    describe('PUT /apiKey/:apiKeyId/enable', function() {
+
+        it('should pass the correct system and action to seneca for enable', function(done) {
+
+            senecaActStub.reset();
+            request(superApp.listen())
+                .put('/apiKey/APIKEY1/enable')
+                .expect(function() {
+                    expect(senecaActStub.args[0][0].system).to.equal('apiKey');
+                    expect(senecaActStub.args[0][0].action).to.equal('enable');
+                })
+                .end(done);
+        });
+
+        it('should pass the correct system and action to seneca for disable', function(done) {
+
+            senecaActStub.reset();
+            request(superApp.listen())
+                .put('/apiKey/APIKEY1/disable')
+                .expect(function() {
+                    expect(senecaActStub.args[0][0].system).to.equal('apiKey');
+                    expect(senecaActStub.args[0][0].action).to.equal('disable');
+                })
+                .end(done);
+        });
+
+        it('should pass the correct apikeyid', function(done) {
+
+            senecaActStub.reset();
+            request(superApp.listen())
+                .put('/apiKey/APIKEY1/enable')
+                .expect(function() {
+                    expect(senecaActStub.args[0][0].apiKeyId).to.equal('APIKEY1');
+                })
+                .end(done);
+        });
+
+        it('should return the response from seneca as the body', function(done) {
+            senecaActStub.reset();
+            request(superApp.listen())
+                .put('/apiKey/APIKEY1/enable')
+                .expect(200)
+                .expect('Content-Type', /json/)
+                .expect(function(res) {
+                    expect(res.body.apiKey).to.equal('RESULT1');
+                })
+                .end(done);
+        })
+    });
+
+    describe('DEL /apiKey/:apiKeyId', function() {
+
+        it('should pass the correct system and action to seneca for delete', function(done) {
+
+            senecaActStub.reset();
+            request(superApp.listen())
+                .delete('/apiKey/APIKEY1')
+                .expect(function() {
+                    expect(senecaActStub.args[0][0].system).to.equal('apiKey');
+                    expect(senecaActStub.args[0][0].action).to.equal('delete');
+                })
+                .end(done);
+        });
+
+        it('should pass the correct apikeyid', function(done) {
+
+            senecaActStub.reset();
+            request(superApp.listen())
+                .delete('/apiKey/APIKEY1')
+                .expect(function() {
+                    expect(senecaActStub.args[0][0].apiKeyId).to.equal('APIKEY1');
+                })
+                .end(done);
+        });
+
+        it('should return a 204 response if the item is found', function(done) {
+
+            senecaActStub.returns(Promise.resolve({ success: true }));
+
+            senecaActStub.reset();
+            request(superApp.listen())
+                .delete('/apiKey/APIKEY1')
+                .expect(204)
+                .end(done);
+        });
+
+        it('should return a 404 response if the item is found', function(done) {
+
+            senecaActStub.returns(Promise.resolve({ success: false, result: 'NOT FOUND' }));
+
+            senecaActStub.reset();
+            request(superApp.listen())
+                .delete('/apiKey/APIKEY1')
+                .expect(404)
+                .end(done);
+        })
     });
 });

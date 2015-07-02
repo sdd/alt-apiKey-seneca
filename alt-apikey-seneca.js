@@ -2,7 +2,6 @@
 
 var _ = require('lodash');
 
-var r      = require('rethinkdb');
 var thinky = require('thinky')();
 var type   = thinky.type;
 
