@@ -75,12 +75,7 @@ module.exports = function(seneca_instance, options) {
         };
         let result = yield seneca.actAsync(args);
 
-        if (result.success) {
-            this.status = 204;
-        } else {
-            this.status = 404;
-        }
-        this.body = result;
+        this.status = result.success ? 204 : 404;
     });
 
 	return router.middleware();
