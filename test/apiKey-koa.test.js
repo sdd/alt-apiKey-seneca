@@ -182,6 +182,8 @@ describe('apiKey-koa', function() {
 
         it('should pass the correct system and action to seneca for delete', function(done) {
 
+            senecaActStub.returns(Promise.resolve({ success: true }));
+
             senecaActStub.reset();
             request(superApp.listen())
                 .delete('/apiKey/APIKEY1')
@@ -193,6 +195,8 @@ describe('apiKey-koa', function() {
         });
 
         it('should pass the correct apikeyid', function(done) {
+
+            senecaActStub.returns(Promise.resolve({ success: true }));
 
             senecaActStub.reset();
             request(superApp.listen())
