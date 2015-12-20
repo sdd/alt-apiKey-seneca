@@ -64,7 +64,7 @@ module.exports = function(config, seneca_instance) {
 
 	seneca.addAsync({ system: 'apiKey', action: 'validate' }, function(args) {
 		return ApiKey.get(args.id)
-			.then(valid => ({ success: true, valid: apiKey.enabled }))
+			.then(apiKey => ({ success: true, valid: !!apiKey.enabled }))
 			.catch(err => ({ success: !err, valid: false, error: err }));
 	});
 
